@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — UniTrack</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* Admin-specific overrides */
+    nav { background: #1a0a3c; }
+    .nav-brand .brand-icon { background: #9b59b6; }
+    .admin-badge {
+      background: #9b59b6;
+      color: #fff;
+      font-size: .7rem; font-weight: 700;
+      padding: .15rem .5rem;
+      border-radius: 4px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .page-header { background: linear-gradient(135deg, #1a0a3c 0%, #2e1065 100%); }
+    .page-header .amber-line { background: #9b59b6; }
+
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .admin-stat {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .admin-stat .big { font-size: 2rem; font-weight: 700; color: #1a0a3c; }
+    .admin-stat .lbl { font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); margin-top: .25rem; }
+
+    .action-btns { display: flex; gap: .4rem; }
+
+    /* Inline edit row */
+    tr.editing td { background: #fdf7ff !important; }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Navigation ─────────────────────────────────────── -->
+  <nav>
+    <a class="nav-brand" href="index.html">
+      <div class="brand-icon">🎓</div>
+      <h1>UniTrack</h1>
+    </a>
+    <div class="nav-links">
+      <span class="admin-badge">Admin</span>
+      <a href="index.html"><i class="fa fa-users"></i> Students</a>
+      <a href="admin.html" class="active"><i class="fa fa-shield-halved"></i> Admin</a>
+    </div>
+  </nav>
+
+  <!-- ─── Page Header ────────────────────────────────────── -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="subtitle">Administration</div>
+      <h2>Admin Control Panel</h2>
+      <div class="amber-line"></div>
+    </div>
+  </div>
+
+  <!-- ─── Main ───────────────────────────────────────────── -->
+  <main>
+
+    <!-- Summary Statistics (≥3 required) -->
+    <div class="admin-stats" id="adminStats">
+      <div class="admin-stat"><div class="big" id="as-total">—</div><div class="lbl">Total Students</div></div>
+      <div class="admin-stat"><div class="big" id="as-active">—</div><div class="lbl">Active</div></div>
+      <div class="admin-stat"><div class="big" id="as-probation">—</div><div class="lbl">On Probation</div></div>
+      <div class="admin-stat"><div class="big" id="as-inactive">—</div><div class="lbl">Inactive</div></div>
+      <div class="admin-stat"><div class="big" id="as-avgcgpa">—</div><div class="lbl">Avg CGPA</div></div>
+      <div class="admin-stat"><div class="big" id="as-feepaid">—</div><div class="lbl">Fee Paid %</div></div>
+      <div class="admin-stat"><div class="big" id="as-hidden">—</div><div class="lbl">Hidden Students</div></div>
+      <div class="admin-stat"><div class="big" id="as-topcgpa">—</div><div class="lbl">Highest CGPA</div></div>
+    </div>
+
+    <!-- Student Management Card -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="fa fa-table-list" style="color:#9b59b6;margin-right:.5rem;"></i>All Students (Admin View)</span>
+        <div style="display:flex;gap:.5rem;align-items:center;">
+          <span id="adminCount" style="font-size:.82rem;color:var(--text-muted);"></span>
+          <button class="btn btn-sm" style="background:#9b59b6;color:#fff;" onclick="openAddModal()">
+            <i class="fa fa-plus"></i> Add Student
+          </button>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
+          <input type="text" id="adminSearch" placeholder="Search all students…" oninput="applyAdminFilters()" />
+        </div>
+        <select id="adminFilterDept" onchange="applyAdminFilters()">
+          <option value="">All Departments</option>
+          <option>Computer Science</option>
+          <option>Information Technology</option>
+          <option>Software Engineering</option>
+          <option>Electrical Engineering</option>
+          <option>Business Administration</option>
+        </select>
+        <select id="adminFilterStatus" onchange="applyAdminFilters()">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="probation">Probation</option>
+          <option value="inactive">Inactive</option>
+        </select>
+        <select id="adminFilterFee" onchange="applyAdminFilters()">
+          <option value="">All Fee Status</option>
+          <option value="paid">Paid</option>
+          <option value="pending">Pending</option>
+          <option value="overdue">Overdue</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <div id="adminListState">
+          <div class="state-box"><div class="spinner"></div><p>Loading…</p></div>
+        </div>
+        <table id="adminTable" style="display:none;">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Student</th>
+              <th>Department</th>
+              <th>Sem</th>
+              <th>CGPA</th>
+              <th>Status</th>
+              <th>Fee</th>
+              <th>Visible</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminBody"></tbody>
+        </table>
+        <div id="adminEmpty" class="empty-state" style="display:none;">
+          <div class="icon">🔍</div>
+          <p>No students match your filters</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p>UniTrack Admin Panel &nbsp;·&nbsp; Web Technologies SP26 &nbsp;·&nbsp; <span>Restricted Access</span></p>
+  </footer>
+
+  <!-- ─── Add/Edit Modal ──────────────────────────────────── -->
+  <div class="modal-backdrop" id="studentModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Add Student</h3>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="m-name">Full Name *</label>
+            <input type="text" id="m-name" placeholder="Full name" />
+            <span class="error-msg" id="merr-name"><i class="fa fa-circle-exclamation"></i> Name required (min 3 chars)</span>
+          </div>
+          <div class="form-group">
+            <label for="m-roll">Roll Number *</label>
+            <input type="text" id="m-roll" placeholder="e.g. BSCS-2201" />
+            <span class="error-msg" id="merr-roll"><i class="fa fa-circle-exclamation"></i> Roll No required (e.g. BSCS-2201)</span>
+          </div>
+          <div class="form-group">
+            <label for="m-email">Email *</label>
+            <input type="text" id="m-email" placeholder="student@uni.edu.pk" />
+            <span class="error-msg" id="merr-email"><i class="fa fa-circle-exclamation"></i> Valid email required</span>
+          </div>
+          <div class="form-group">
+            <label for="m-phone">Phone *</label>
+            <input type="text" id="m-phone" placeholder="03XX-XXXXXXX" />
+            <span class="error-msg" id="merr-phone"><i class="fa fa-circle-exclamation"></i> Format: 03XX-XXXXXXX</span>
+          </div>
+          <div class="form-group">
+            <label for="m-dept">Department *</label>
+            <select id="m-dept">
+              <option value="">— Select —</option>
+              <option>Computer Science</option>
+              <option>Information Technology</option>
+              <option>Software Engineering</option>
+              <option>Electrical Engineering</option>
+              <option>Business Administration</option>
+            </select>
+            <span class="error-msg" id="merr-dept"><i class="fa fa-circle-exclamation"></i> Select department</span>
+          </div>
+          <div class="form-group">
+            <label for="m-sem">Semester *</label>
+            <select id="m-sem">
+              <option value="">— Select —</option>
+              <option>1st</option><option>2nd</option><option>3rd</option>
+              <option>4th</option><option>5th</option><option>6th</option>
+              <option>7th</option><option>8th</option>
+            </select>
+            <span class="error-msg" id="merr-sem"><i class="fa fa-circle-exclamation"></i> Select semester</span>
+          </div>
+          <div class="form-group">
+            <label for="m-cgpa">CGPA</label>
+            <input type="number" id="m-cgpa" placeholder="0.00 – 4.00" min="0" max="4" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label for="m-status">Status</label>
+            <select id="m-status">
+              <option value="active">Active</option>
+              <option value="probation">Probation</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="m-fee">Fee Status</label>
+            <select id="m-fee">
+              <option value="paid">Paid</option>
+              <option value="pending">Pending</option>
+              <option value="overdue">Overdue</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="m-gender">Gender</label>
+            <select id="m-gender">
+              <option value="">— Select —</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="m-date">Enrollment Date</label>
+            <input type="date" id="m-date" />
+          </div>
+          <div class="form-group">
+            <label for="m-visible">Visible to Users</label>
+            <select id="m-visible">
+              <option value="true">Yes</option>
+              <option value="false">No (Hidden)</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label for="m-addr">Address</label>
+            <input type="text" id="m-addr" placeholder="Street, City" />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+          <button class="btn" style="background:#9b59b6;color:#fff;" id="modalSaveBtn" onclick="saveStudent()">
+            <i class="fa fa-floppy-disk"></i> Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Delete Confirm ──────────────────────────────────── -->
+  <div class="modal-backdrop" id="confirmModal">
+    <div class="confirm-box">
+      <div class="warn-icon">⚠️</div>
+      <h3>Delete Student?</h3>
+      <p id="confirmMsg">This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn btn-outline" onclick="closeConfirm()">Cancel</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn" onclick="confirmDelete()">
+          <i class="fa fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast"></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

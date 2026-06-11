@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Directory — BSCS 4th Semester</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+
+  <!-- ─── Navigation ─────────────────────────────────────── -->
+  <nav>
+    <a class="nav-brand" href="index.html">
+      <div class="brand-icon">🎓</div>
+      <h1>UniTrack</h1>
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="active"><i class="fa fa-users"></i> Students</a>
+      <a href="admin.html"><i class="fa fa-shield-halved"></i> Admin</a>
+    </div>
+  </nav>
+
+  <!-- ─── Page Header ────────────────────────────────────── -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="subtitle">Student Management System</div>
+      <h2>Student Directory</h2>
+      <div class="amber-line"></div>
+    </div>
+  </div>
+
+  <!-- ─── Main Content ───────────────────────────────────── -->
+  <main>
+
+    <!-- Stats Row -->
+    <div class="stats-grid" id="statsRow">
+      <div class="stat-card">
+        <div class="stat-icon blue">👥</div>
+        <div class="stat-info">
+          <div class="value" id="st-total">—</div>
+          <div class="label">Total Students</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div class="stat-info">
+          <div class="value" id="st-active">—</div>
+          <div class="label">Active</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber">⭐</div>
+        <div class="stat-info">
+          <div class="value" id="st-cgpa">—</div>
+          <div class="label">Avg CGPA</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple">🏛️</div>
+        <div class="stat-info">
+          <div class="value" id="st-depts">—</div>
+          <div class="label">Departments</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enroll Form Card -->
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div class="card-header">
+        <span class="card-title"><i class="fa fa-user-plus" style="color:var(--amber);margin-right:.5rem;"></i>Enroll New Student</span>
+        <button class="btn btn-outline btn-sm" id="toggleFormBtn" onclick="toggleForm()">
+          <i class="fa fa-chevron-down" id="toggleIcon"></i> Show Form
+        </button>
+      </div>
+
+      <div id="enrollForm" style="display:none;">
+        <div class="form-grid">
+          <!-- Full name -->
+          <div class="form-group">
+            <label for="f-name">Full Name *</label>
+            <input type="text" id="f-name" placeholder="e.g. Ayesha Tariq" />
+            <span class="error-msg" id="err-name"><i class="fa fa-circle-exclamation"></i> Name is required (min 3 chars)</span>
+          </div>
+
+          <!-- Roll No -->
+          <div class="form-group">
+            <label for="f-roll">Roll Number *</label>
+            <input type="text" id="f-roll" placeholder="e.g. BSCS-2201" />
+            <span class="error-msg" id="err-roll"><i class="fa fa-circle-exclamation"></i> Roll No required (e.g. BSCS-2201)</span>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="f-email">Email Address *</label>
+            <input type="text" id="f-email" placeholder="student@uni.edu.pk" />
+            <span class="error-msg" id="err-email"><i class="fa fa-circle-exclamation"></i> Valid email required</span>
+          </div>
+
+          <!-- Phone -->
+          <div class="form-group">
+            <label for="f-phone">Phone *</label>
+            <input type="text" id="f-phone" placeholder="03XX-XXXXXXX" />
+            <span class="error-msg" id="err-phone"><i class="fa fa-circle-exclamation"></i> Format: 03XX-XXXXXXX</span>
+          </div>
+
+          <!-- Department -->
+          <div class="form-group">
+            <label for="f-dept">Department *</label>
+            <select id="f-dept">
+              <option value="">— Select —</option>
+              <option>Computer Science</option>
+              <option>Information Technology</option>
+              <option>Software Engineering</option>
+              <option>Electrical Engineering</option>
+              <option>Business Administration</option>
+            </select>
+            <span class="error-msg" id="err-dept"><i class="fa fa-circle-exclamation"></i> Please select a department</span>
+          </div>
+
+          <!-- Semester -->
+          <div class="form-group">
+            <label for="f-sem">Semester *</label>
+            <select id="f-sem">
+              <option value="">— Select —</option>
+              <option>1st</option><option>2nd</option><option>3rd</option>
+              <option>4th</option><option>5th</option><option>6th</option>
+              <option>7th</option><option>8th</option>
+            </select>
+            <span class="error-msg" id="err-sem"><i class="fa fa-circle-exclamation"></i> Please select a semester</span>
+          </div>
+
+          <!-- Gender -->
+          <div class="form-group">
+            <label for="f-gender">Gender</label>
+            <select id="f-gender">
+              <option value="">— Select —</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <!-- Enrollment Date -->
+          <div class="form-group">
+            <label for="f-date">Enrollment Date</label>
+            <input type="date" id="f-date" />
+          </div>
+
+          <!-- Address -->
+          <div class="form-group full">
+            <label for="f-addr">Address</label>
+            <input type="text" id="f-addr" placeholder="Street, City" />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-outline" type="button" onclick="resetForm()">
+            <i class="fa fa-rotate-left"></i> Reset
+          </button>
+          <button class="btn btn-primary" type="button" onclick="submitEnroll()">
+            <i class="fa fa-paper-plane"></i> Enroll Student
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student List Card -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title"><i class="fa fa-list" style="color:var(--amber);margin-right:.5rem;"></i>Enrolled Students</span>
+        <span id="resultCount" style="font-size:.82rem;color:var(--text-muted);"></span>
+      </div>
+
+      <!-- Toolbar: search + filters -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
+          <input type="text" id="searchInput" placeholder="Search by name, roll no, email…" oninput="applyFilters()" />
+        </div>
+        <select id="filterDept" onchange="applyFilters()">
+          <option value="">All Departments</option>
+          <option>Computer Science</option>
+          <option>Information Technology</option>
+          <option>Software Engineering</option>
+          <option>Electrical Engineering</option>
+          <option>Business Administration</option>
+        </select>
+        <select id="filterSem" onchange="applyFilters()">
+          <option value="">All Semesters</option>
+          <option>1st</option><option>2nd</option><option>3rd</option>
+          <option>4th</option><option>5th</option><option>6th</option>
+          <option>7th</option><option>8th</option>
+        </select>
+        <select id="filterStatus" onchange="applyFilters()">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="probation">Probation</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <div id="listState">
+          <div class="state-box">
+            <div class="spinner"></div>
+            <p>Loading students…</p>
+          </div>
+        </div>
+        <table id="studentTable" style="display:none;">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Student</th>
+              <th>Department</th>
+              <th>Semester</th>
+              <th>CGPA</th>
+              <th>Status</th>
+              <th>Fee</th>
+            </tr>
+          </thead>
+          <tbody id="studentBody"></tbody>
+        </table>
+        <div id="emptyState" class="empty-state" style="display:none;">
+          <div class="icon">🔍</div>
+          <p>No students match your filters</p>
+          <small>Try adjusting the search or filter options</small>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <p>UniTrack Student Management System &nbsp;·&nbsp; Web Technologies SP26 &nbsp;·&nbsp; Built with <span>♥</span></p>
+  </footer>
+
+  <!-- Toast container -->
+  <div id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
